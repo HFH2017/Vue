@@ -20,6 +20,9 @@ let router = new VueRouter({
 new Vue({
   router,
   template: '<App/>',
-  components: {App}
+  components: {App},
+  data: {
+    eventHub: new Vue()
+  }
 }).$mount('#app');
 router.push('goods');

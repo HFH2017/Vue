@@ -27,6 +27,9 @@
                 <div class="price">
                   <span class="now">￥{{food.price}}</span><span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                 </div>
+                <div class="cartcontrol-wrapper">
+                  <cartcontrol :food="food"></cartcontrol>
+                </div>
               </div>
 
             </li>
@@ -35,14 +38,18 @@
         </li>
       </ul>
     </div>
-    <shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
+    <shopcart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import BScroll from 'better-scroll';
   import shopcart from '../shopcart/shopcart.vue';
+  import cartcontrol from '../cartcontrol/cartcontral.vue';
+  import Vue from 'vue';
   const ERR_OK = 0;
+  /* eslint-disable no-unused-vars */
+  const eventHub = new Vue();
 export default {
     props: {
         seller: {
@@ -66,6 +73,17 @@ export default {
             }
         }
         return 0;
+    },
+    selectFoods() {
+        let foods = [];
+        this.goods.forEach((good) => {
+            good.foods.forEach((food) => {
+                if (food.count) {
+                    foods.push(food);
+                }
+            });
+        });
+        return foods;
     }
   },
   created() {
@@ -82,30 +100,32 @@ export default {
         });
   },
   components: {
-    shopcart
+    shopcart,
+    cartcontrol
   },
   methods: {
-        _initScroll() {
-            this.menuScroll = new BScroll(this.$refs.menuWrapper, {
-              click: true
-            });
-            this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
-                probeType: 3
-            });
-              this.foodsScroll.on('scroll', (pos) => {
-              this.ScrollY = Math.abs(Math.round(pos.y));
-            });
-        },
-        _calculateHeight() {
-            let foodList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook');
-            let height = 0;
-            this.listHeight.push(height);
-            for (let i = 0; i < foodList.length; i++) {
-                let item = foodList[i];
-                height += item.clientHeight;
-                this.listHeight.push(height);
-            }
-        },
+    _initScroll() {
+      this.menuScroll = new BScroll(this.$refs.menuWrapper, {
+        click: true
+      });
+      this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
+        click: true,
+        probeType: 3
+      });
+      this.foodsScroll.on('scroll', (pos) => {
+        this.ScrollY = Math.abs(Math.round(pos.y));
+      });
+    },
+    _calculateHeight() {
+      let foodList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook');
+      let height = 0;
+      this.listHeight.push(height);
+      for (let i = 0; i < foodList.length; i++) {
+        let item = foodList[i];
+        height += item.clientHeight;
+        this.listHeight.push(height);
+      }
+    },
     selectMenu(index, event) {
       if (!event._constructed) {
         return;
@@ -222,6 +242,10 @@ export default {
             color rgb(147,153,159)
 
 
+        .cartcontrol-wrapper
+          position absolute
+          right 0
+          bottom 12px
 
 
 
