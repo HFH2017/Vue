@@ -1,4 +1,5 @@
 <template>
+  <div>
   <div class="goods">
     <div class="menu-wrapper" ref="menuWrapper">
       <ul>
@@ -14,7 +15,7 @@
         <li v-for="item in goods" class="foods-list food-list-hook">
           <h1 class="title">{{item.name}}</h1>
           <ul>
-            <li v-for="food in item.foods" class="food-item border-1px">
+            <li @click="selectFood(food,$event)" v-for="food in item.foods" class="food-item border-1px">
               <div class="icon">
                 <img width="57" height="57" :src="food.icon" alt="">
               </div>
@@ -31,14 +32,14 @@
                   <cartcontrol :food="food"></cartcontrol>
                 </div>
               </div>
-
             </li>
           </ul>
-
         </li>
       </ul>
     </div>
     <shopcart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
+  </div>
+  <food ref="food" :food="selectedFood"></food>
   </div>
 </template>
 
@@ -46,6 +47,7 @@
   import BScroll from 'better-scroll';
   import shopcart from '../shopcart/shopcart.vue';
   import cartcontrol from '../cartcontrol/cartcontral.vue';
+  import food from '../food/food.vue';
   import Vue from 'vue';
   const ERR_OK = 0;
   /* eslint-disable no-unused-vars */
@@ -58,9 +60,10 @@ export default {
     },
   data() {
         return {
-            goods: [],
-            listHeight: [],
-            ScrollY: 0
+          goods: [],
+          listHeight: [],
+          ScrollY: 0,
+          selectedFood: {}
         };
   },
   computed: {
@@ -101,7 +104,8 @@ export default {
   },
   components: {
     shopcart,
-    cartcontrol
+    cartcontrol,
+    food
   },
   methods: {
     _initScroll() {
@@ -133,6 +137,13 @@ export default {
       let foodList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook');
       let el = foodList[index];
       this.foodsScroll.scrollToElement(el, 300);
+    },
+    selectFood(food, event) {
+      if (!event._constructed) {
+        return;
+      }
+      this.selectedFood = food;
+      this.$refs.food.show();
     }
   }
 };
@@ -240,8 +251,6 @@ export default {
             text-decoration line-through
             font-size 10px
             color rgb(147,153,159)
-
-
         .cartcontrol-wrapper
           position absolute
           right 0
